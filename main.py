@@ -1,14 +1,16 @@
 from fastapi import FastAPI, UploadFile, File
-import whisper
+from faster_whisper import WhisperModel
 import shutil
 
 app = FastAPI()
-model = whisper.load_model("base")
+model = WhisperModel("base", compute_type="int8")
 
 @app.post("/transcribe")
 async def transcribe(file: UploadFile = File(...)):
     with open("audio.wav", "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
 
-    result = model.transcribe("audio.wav", language="pt")
-    return {"text": result["text"]}
+    segments, _ = model.transcribe("audio.wav", language="pt")
+    text = "".join([segment.text for segment in segments])
+
+    return {"text": text}
