@@ -31,7 +31,7 @@ async def chat_audio(file: UploadFile = File(...)):
         f.write(await file.read())
 
     # 2️⃣ Transcrição
-    segments, _ = whisper.transcribe(input_path)
+    segments, _ = model.transcribe(input_path)
     texto = " ".join([seg.text for seg in segments])
 
     # 3️⃣ Resposta (LLM simples para economizar RAM)
